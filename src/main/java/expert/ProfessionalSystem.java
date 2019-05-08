@@ -32,6 +32,11 @@ public class ProfessionalSystem {
     }
     private void addMenu(){
         this.frame=new JFrame("专家系统");
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         JMenuBar menuBar=new JMenuBar();
         JMenu direction=new JMenu("推理方向");
         JMenuItem item=new JMenuItem("正向推理");

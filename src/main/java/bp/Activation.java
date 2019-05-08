@@ -7,7 +7,7 @@ package bp;
 public class Activation {
     public static Integer SIGMOID = 1;
     public static Integer NOACTIVATION=3;
-    public static Integer THAH=2;
+    public static Integer TANH=2;
     private static Double sigmoid(Double y, Boolean isPositive) {
         if (isPositive) {
             return 1.0 / (1 + Math.exp(-y));
@@ -17,7 +17,11 @@ public class Activation {
     }
 
     private static Double tanh(Double y, Boolean isPositive) {
-        throw new RuntimeException("还没有实现这个方法");
+        if (isPositive) {
+            return (Math.exp(y)- Math.exp(-y) )/(Math.exp(-y)+Math.exp(y));
+        } else {
+            return 1-y*y;
+        }
     }
 
     private static Double none(Double y,Boolean ispositive){
@@ -33,7 +37,7 @@ public class Activation {
             return sigmoid(y, ispositive);
         }
         if (type == 2) {
-            throw new RuntimeException("还没有实现这个方法");
+            return tanh(y,ispositive);
         }
         if(type==3){
             return none(y,ispositive);
