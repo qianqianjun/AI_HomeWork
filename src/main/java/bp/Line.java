@@ -4,6 +4,7 @@ package bp;
  * @author 高谦
  * 神经元之间的连接线类。
  */
+
 public class Line {
     private Neuron otherNeuron;
     private Double weight;

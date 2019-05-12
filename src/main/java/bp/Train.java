@@ -1,4 +1,6 @@
 package bp;
+import javafx.scene.control.TableRow;
+
 import java.util.List;
 
 /**
@@ -9,22 +11,32 @@ import java.util.List;
 public class Train {
     private Layer begin;
     private Layer end;
+    private TrainData trainData;
     private Double[] preduction;
     private Double learnRate;
     private Double loss;
     private Integer totalStep;
     private Double minLoss;
 
-    public Train(Layer inputLayer, Layer outputLayer, Double[] preductionOutput) {
+    /**
+     * 构造函数
+     * @param inputLayer 需要进行训练的神经网络的输入层
+     * @param outputLayer  需要进行训练的神经网络的输出层
+     * @param trainData 这里是训练数据类。
+     */
+    public Train(Layer inputLayer, Layer outputLayer, TrainData trainData) {
         this.begin = inputLayer;
         this.end = outputLayer;
-        this.preduction = preductionOutput;
-        if (outputLayer.getOutputSize() != preductionOutput.length) {
+        this.trainData=trainData;
+        if (outputLayer.getOutputSize() != trainData.getEachPreductionOutputSize()) {
             throw new RuntimeException("致命错误：输出层的输出个数与预期输出个数不符！");
         }
     }
 
-    // 正向传播函数：
+    /**
+     * 正向传播函数实现
+     * 没有参数，参数使用的是网络中的数据。
+     */
     private void positive() {
         Layer currentLayer = this.begin;
         while (currentLayer.hasNextLayer()) {
@@ -54,7 +66,10 @@ public class Train {
         this.loss = loss;
     }
 
-    // 反向传播函数：
+    /**
+     * 反向传播函数实现
+     * 无参数，使用的是神经网络中的参数。
+     */
     private void reverse() {
         // 计算输出层的神经元对于数据的输出：
         Layer output = this.end;
@@ -91,6 +106,10 @@ public class Train {
         }
     }
 
+    /**
+     *  无特殊作用，用于检查网络的情况
+     *  Debug 的时候使用
+     */
     private void showInfo() {
         Layer currentLayer = this.begin;
         while (currentLayer != null) {
@@ -99,18 +118,29 @@ public class Train {
         }
     }
 
+    /**
+     * 回想过程
+     * 这里主要对训练集进行测试，如果测试效果变差，那就说明网络是错误的。
+     * 如果测试的效果很好，也有可能是过拟合了，测试集上不一定就好。
+     */
+
     public void recall() {
         System.out.println("-----------recall---------------");
         System.out.println("预期输出：");
-        for (Double item : this.preduction) {
-            System.out.printf("%.5f ", item);
+        for(Integer i=0;i<this.trainData.getData().length;i++){
+            this.preduction=this.trainData.getPreductionOutput()[i];
+            this.begin.setLayerTrainData(this.trainData.getData()[i]);
+            this.positive();
+            for (Double item : this.preduction) {
+                System.out.printf("%.5f ", item);
+            }
+            System.out.println();
+            List<Neuron> neurons = this.end.getNeurons();
+            for (Neuron neuron : neurons) {
+                System.out.printf("%.5f ", neuron.getNeuronOutput());
+            }
+            System.out.println("\n===========");
         }
-        System.out.println();
-        List<Neuron> neurons = this.end.getNeurons();
-        for (Neuron neuron : neurons) {
-            System.out.printf("%.5f ", neuron.getNeuronOutput());
-        }
-        System.out.println();
     }
 
     public Double getLoss() {
@@ -123,12 +153,57 @@ public class Train {
         this.minLoss = minloss;
     }
 
-    public void train(Integer trainLogInterval, Integer recallInterval) {
-        for (Integer i = 0; i < this.totalStep; i++) {
+    /**
+     * 每一次的训练过程
+     * 首先需要初始化这一次的训练集输入
+     * 然后初始化这一次的训练集标准输出
+     * 然后进行正向传播和反向传播进行训练。
+     */
+    private void debug(){
+        for(Double[] item:this.trainData.getData()){
+            System.out.print(item[0]);
+            System.out.print(" ");
+            System.out.print(item[1]);
+            System.out.print(" | ");
+        }
+        System.out.println();
+        for(Double[] item:this.trainData.getPreductionOutput()){
+            System.out.print(item[0]);
+            System.out.print(" | ");
+        }
+        System.out.println();
+        throw new RuntimeException("操你妈");
+    }
+    public void eachTrain(){
+        for(Integer i=0;i<this.trainData.getData().length;i++) {
+            this.preduction = this.trainData.getPreductionOutput()[i];
+            this.begin.setLayerTrainData(this.trainData.getData()[i]);
             this.positive();
             this.reverse();
+        }
+    }
+
+    /**
+     * 真正的训练过程
+     * @param trainLogInterval  打印训练日志的间隔
+     * @param recallInterval 回想的间隔
+     */
+    public void train(Integer trainLogInterval, Integer recallInterval) {
+        Double Minloss=100000000.0;
+        System.out.println(totalStep);
+        System.out.println(learnRate);
+        System.out.println(minLoss);
+        for (Integer i = 0; i < this.totalStep; i++) {
+            eachTrain();
             if ((i + 1) % trainLogInterval == 0) {
                 System.out.printf("[训练过程] step：%d  loss : %.10f\n", i, loss);
+                if(Minloss<loss){
+                    this.learnRate=this.learnRate/2;
+                    Minloss=loss;
+                }
+                else{
+                    Minloss=loss;
+                }
                 if (this.getLoss() < minLoss) {
                     this.recall();
                     System.out.println("达到最小精度 ，训练结束！");

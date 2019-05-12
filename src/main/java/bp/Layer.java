@@ -19,18 +19,14 @@ public class Layer {
     }
 
     // 第一种个构建方式，输入一个数据，用来建立输入层。
-    public Layer(Double[] input) {
-        if(input.length==0)
-            throw new RuntimeException("请检查您的输入");
+    public Layer(Integer size) {
+        if(size==0)
+            throw new RuntimeException("您建立的输入层没有输出，无法建立网络");
         this.output = new ArrayList<>();
-        for (Double item : input) {
-            this.output.add(item);
-        }
-        this.outputSize = input.length;
+        this.outputSize = size;
         this.neurons = new ArrayList<>();
-        for (Integer i = 0; i < input.length; i++) {
+        for (Integer i = 0; i < size;i++) {
             this.neurons.add(new Neuron());
-            this.neurons.get(i).setNeuronOutput(input[i]);
         }
     }
 
@@ -49,6 +45,20 @@ public class Layer {
                 Line line = new Line(this.otherLayer.neurons.get(j), randomDouble(4));
                 this.neurons.get(i).addNeuronInput(line);
             }
+        }
+    }
+
+    /**
+     * 用于将训练的数据传送给神经元层。
+     * @param batchData
+     */
+    public void setLayerTrainData(Double[] batchData){
+        if(batchData.length!=this.neurons.size()){
+            throw new RuntimeException("未知错误：输入的batchData 的大小和神经元的个数不一致！");
+        }
+        // 将参数赋值给输入层的神经元。
+        for(Integer i=0;i<batchData.length;i++){
+            this.neurons.get(i).setNeuronOutput(batchData[i]);
         }
     }
 
