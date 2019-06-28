@@ -1,4 +1,4 @@
-package bp;
+package noguibp.structure;
 
 /**
  * @author 高谦

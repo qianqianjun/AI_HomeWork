@@ -1,4 +1,4 @@
-package bp;
+package noguibp.train;
 
 /**
  * @author 高谦
@@ -8,9 +8,15 @@ public class TrainData {
     private Integer batchSize;
     private Double[][] data;
     private Double[][] preductionOutput;
-    public TrainData(Double[][] x,Double[][] y){
+
+    public Double[][] testxData;
+    public Double[][] testyData;
+
+    public TrainData(Double[][] x,Double[][] y,Double[][] testDatax,Double[][] testDatay){
         this.data=x;
         this.preductionOutput=y;
+        this.testxData=testDatax;
+        this.testyData=testDatay;
         this.batchSize=x.length;
         if(this.batchSize==0){
             throw new RuntimeException("请您输入训练数据");

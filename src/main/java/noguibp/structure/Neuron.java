@@ -1,4 +1,4 @@
-package bp;
+package noguibp.structure;
 
 import java.util.ArrayList;
 import java.util.List;

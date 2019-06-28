@@ -1,4 +1,5 @@
-package bp;
+package noguibp.structure;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -131,6 +132,8 @@ public class Layer {
     }
 
 
+
+    /** debug **/
     public void showInfo() {
         for(Integer i=0;i<this.neurons.size();i++){
             System.out.println("neuron index of current layer："+i);
@@ -141,4 +144,5 @@ public class Layer {
         }
         System.out.println("-------------------------------------");
     }
+    /** debug end **/
 }
